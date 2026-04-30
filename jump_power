@@ -1,0 +1,121 @@
+--[[
+    JUMP POWER CUSTOM UI - BY MEO2 DEV
+    Features: Custom Jump Input, Toggle On/Off
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local Title = Instance.new("TextLabel")
+local JumpInput = Instance.new("TextBox")
+local ToggleBtn = Instance.new("TextButton")
+
+-- Settings logic
+local jumpEnabled = false
+local currentJump = 50 -- Mặc định của Roblox là 50
+
+-- Setup ScreenGui
+ScreenGui.Name = "Meo2Dev_JumpHub"
+ScreenGui.Parent = game.CoreGui
+
+-- Khung chính
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Gradient màu xanh Neon cho khác biệt với bản Speed
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 127)), 
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 150, 255)) 
+}
+UIGradient.Parent = MainFrame
+
+-- Tiêu đề
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "JUMP MODIFIER"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+
+-- Ô nhập độ cao (Input Box)
+JumpInput.Name = "JumpInput"
+JumpInput.Parent = MainFrame
+JumpInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+JumpInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+JumpInput.Size = UDim2.new(0.8, 0, 0, 30)
+JumpInput.Font = Enum.Font.Gotham
+JumpInput.PlaceholderText = "Nhập độ nhảy..."
+JumpInput.Text = ""
+JumpInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+JumpInput.TextSize = 14
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 5)
+InputCorner.Parent = JumpInput
+
+-- Nút Bật/Tắt (Toggle Button)
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = MainFrame
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0, 35)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "OFF"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.TextSize = 14
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 5)
+BtnCorner.Parent = ToggleBtn
+
+-- Logic thực thi
+JumpInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local num = tonumber(JumpInput.Text)
+        if num then
+            currentJump = num
+        else
+            JumpInput.Text = ""
+        end
+    end
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    jumpEnabled = not jumpEnabled
+    if jumpEnabled then
+        ToggleBtn.Text = "ON"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    else
+        ToggleBtn.Text = "OFF"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        -- Reset JumpPower
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.UseJumpPower = true
+            player.Character.Humanoid.JumpPower = 50
+        end
+    end
+end)
+
+-- Vòng lặp duy trì
+game:GetService("RunService").RenderStepped:Connect(function()
+    if jumpEnabled then
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.UseJumpPower = true
+            player.Character.Humanoid.JumpPower = currentJump
+        end
+    end
+end)
+
+print("Meo2 Dev Jump Script Loaded!")
