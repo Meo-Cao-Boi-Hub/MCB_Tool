@@ -1,0 +1,42 @@
+--[[
+    CLICK TO TELEPORT TOOL - BY MEO2 DEV
+    No GUI - Tool Based
+    Instruction: Run script to get tool, Click anywhere to teleport.
+]]
+
+local Player = game:GetService("Players").LocalPlayer
+local Mouse = Player:GetMouse()
+local StarterGui = game:GetService("StarterGui")
+
+-- Hàm gửi thông báo
+local function notify(msg)
+    StarterGui:SetCore("SendNotification", {
+        Title = "MEO2 DEV INFO",
+        Text = msg,
+        Duration = 3
+    })
+end
+
+-- Tạo Tool Dịch Chuyển
+local TeleportTool = Instance.new("Tool")
+TeleportTool.Name = "Teleport Tool"
+TeleportTool.RequiresHandle = false -- Không cần tay cầm (Handle)
+TeleportTool.Parent = Player.Backpack
+
+-- Logic khi sử dụng Tool
+TeleportTool.Activated:Connect(function()
+    local Character = Player.Character
+    if Character and Character:FindFirstChild("HumanoidRootPart") then
+        local TargetPos = Mouse.Hit.p -- Lấy vị trí click chuột
+        -- Dịch chuyển lên cao một chút (tính theo trục Y) để tránh kẹt đất
+        Character.HumanoidRootPart.CFrame = CFrame.new(TargetPos + Vector3.new(0, 3, 0))
+    end
+end)
+
+-- Thông báo khi nhận được hàng
+notify("Đã nhận vật phẩm dịch chuyển!")
+
+-- Tự động dọn dẹp nếu muốn chạy lại script mà không bị đầy Backpack
+TeleportTool.Unequipped:Connect(function()
+    -- Bạn có thể thêm logic ở đây nếu cần
+end)
