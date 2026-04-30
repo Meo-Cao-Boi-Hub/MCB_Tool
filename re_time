@@ -1,0 +1,113 @@
+--[[
+    TIME REWIND SYSTEM - BY MEO2 DEV
+    Style: Cyberpunk Neon
+    Feature: Record & Playback character position (Tua ngược thời gian)
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local Title = Instance.new("TextLabel")
+local RewindBtn = Instance.new("TextButton")
+local StatusLab = Instance.new("TextLabel")
+
+-- Logic Variables
+local isRewinding = false
+local recording = {}
+local maxRecords = 300 -- Ghi nhớ khoảng 10 giây (300 frames)
+
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Root = Character:WaitForChild("HumanoidRootPart")
+
+-- Setup UI
+ScreenGui.Name = "TimeRewind_UI"
+ScreenGui.Parent = game.CoreGui
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+MainFrame.Position = UDim2.new(0.5, -60, 0.8, 0)
+MainFrame.Size = UDim2.new(0, 120, 0, 120)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = MainFrame
+
+-- Gradient màu xanh thời gian (Time Blue)
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)), 
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 85, 255)) 
+}
+UIGradient.Rotation = 90
+UIGradient.Parent = MainFrame
+
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "TIME CONTROL"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 12
+
+-- Nút REWIND (Trái tim của script)
+RewindBtn.Name = "RewindBtn"
+RewindBtn.Parent = MainFrame
+RewindBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RewindBtn.BackgroundTransparency = 0.9
+RewindBtn.Position = UDim2.new(0.1, 0, 0.35, 0)
+RewindBtn.Size = UDim2.new(0.8, 0, 0, 60)
+RewindBtn.Font = Enum.Font.GothamBold
+RewindBtn.Text = "⏪ REWIND"
+RewindBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+RewindBtn.TextSize = 18
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 10)
+BtnCorner.Parent = RewindBtn
+
+-- TECHNICAL LOGIC: RECORD & REWIND
+game:GetService("RunService").Heartbeat:Connect(function()
+    if not Root or not Character:FindFirstChild("Humanoid") then return end
+
+    if isRewinding then
+        -- Chế độ tua ngược: Lấy dữ liệu từ cuối mảng ra
+        if #recording > 0 then
+            local lastPos = recording[#recording]
+            Root.CFrame = lastPos
+            table.remove(recording, #recording)
+            
+            -- Hiệu ứng bóng ma (Ghost Effect)
+            Root.Velocity = Vector3.new(0,0,0)
+        else
+            isRewinding = false
+            RewindBtn.Text = "⏪ REWIND"
+            Character.HumanoidRootPart.Anchored = false
+        end
+    else
+        -- Chế độ ghi: Lưu vị trí mỗi frame
+        table.insert(recording, Root.CFrame)
+        if #recording > maxRecords then
+            table.remove(recording, 1) -- Xóa dữ liệu cũ nhất
+        end
+    end
+end)
+
+-- Click Event
+RewindBtn.MouseButton1Click:Connect(function()
+    if #recording > 0 and not isRewinding then
+        isRewinding = true
+        RewindBtn.Text = "🌀 VOID..."
+        
+        -- Thông báo
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "TIME TRAVEL",
+            Text = "Đang tua ngược thời gian...",
+            Duration = 2
+        })
+    end
+end)
+
+print("Meo2 Dev Time Rewind Loaded!")
