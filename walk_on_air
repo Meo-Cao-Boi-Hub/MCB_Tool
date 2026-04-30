@@ -1,0 +1,127 @@
+--[[
+    AIR WALK (WALK ON AIR) - BY MEO2 DEV
+    Features: Toggle On/Off, Height Control (Up/Down)
+    Style: Minimalist Gradient GUI
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local Title = Instance.new("TextLabel")
+local ToggleBtn = Instance.new("TextButton")
+local UpBtn = Instance.new("TextButton")
+local DownBtn = Instance.new("TextButton")
+
+-- Logic Variables
+local airWalkEnabled = false
+local currentHeight = 0
+local airPlatform = nil
+local player = game.Players.LocalPlayer
+
+-- Setup GUI
+ScreenGui.Name = "Meo2Dev_AirWalk"
+ScreenGui.Parent = game.CoreGui
+
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.5, -75, 0.5, -60)
+MainFrame.Size = UDim2.new(0, 150, 0, 120)
+MainFrame.Active = true
+MainFrame.Draggable = true
+UICorner.Parent = MainFrame
+
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 170, 255)), 
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 50, 150)) 
+}
+UIGradient.Parent = MainFrame
+
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "AIR WALK"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 14
+
+-- Nút Bật/Tắt
+ToggleBtn.Parent = MainFrame
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0, 30)
+ToggleBtn.Text = "OFF"
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 6)
+
+-- Nút Lên (↑)
+UpBtn.Parent = MainFrame
+UpBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+UpBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+UpBtn.Size = UDim2.new(0.35, 0, 0, 30)
+UpBtn.Text = "↑"
+UpBtn.TextSize = 20
+UpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", UpBtn).CornerRadius = UDim.new(0, 6)
+
+-- Nút Xuống (↓)
+DownBtn.Parent = MainFrame
+DownBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+DownBtn.Position = UDim2.new(0.55, 0, 0.65, 0)
+DownBtn.Size = UDim2.new(0.35, 0, 0, 30)
+DownBtn.Text = "↓"
+DownBtn.TextSize = 20
+DownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", DownBtn).CornerRadius = UDim.new(0, 6)
+
+-- Function tạo nền đi bộ
+local function updatePlatform()
+    if airWalkEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        if not airPlatform then
+            airPlatform = Instance.new("Part")
+            airPlatform.Name = "AirWalkPlatform"
+            airPlatform.Parent = workspace
+            airPlatform.Size = Vector3.new(6, 1, 6)
+            airPlatform.Transparency = 1 -- Vô hình
+            airPlatform.Anchored = true
+        end
+        local root = player.Character.HumanoidRootPart
+        airPlatform.CFrame = CFrame.new(root.Position.X, currentHeight, root.Position.Z)
+    else
+        if airPlatform then
+            airPlatform:Destroy()
+            airPlatform = nil
+        end
+    end
+end
+
+-- Events
+ToggleBtn.MouseButton1Click:Connect(function()
+    airWalkEnabled = not airWalkEnabled
+    if airWalkEnabled then
+        ToggleBtn.Text = "ON"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            currentHeight = player.Character.HumanoidRootPart.Position.Y - 3.5
+        end
+    else
+        ToggleBtn.Text = "OFF"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    end
+end)
+
+UpBtn.MouseButton1Click:Connect(function()
+    if airWalkEnabled then currentHeight = currentHeight + 2 end
+end)
+
+DownBtn.MouseButton1Click:Connect(function()
+    if airWalkEnabled then currentHeight = currentHeight - 2 end
+end)
+
+-- Loop duy trì nền dưới chân
+game:GetService("RunService").RenderStepped:Connect(function()
+    updatePlatform()
+end)
+
+print("Meo2 Dev Air Walk Loaded!")
