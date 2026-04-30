@@ -1,0 +1,138 @@
+--[[
+    FLY WASD ULTRA SMOOTH - BY MEO2 DEV
+    Control: W, A, S, D to move relative to your Camera.
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local Title = Instance.new("TextLabel")
+local SpeedInput = Instance.new("TextBox")
+local ToggleBtn = Instance.new("TextButton")
+
+-- Services
+local Plr = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local Cam = workspace.CurrentCamera
+
+-- Fly Variables
+local flyEnabled = false
+local flySpeed = 50
+local bv, bg
+
+-- Setup UI
+ScreenGui.Name = "Meo2Dev_FlyWASD"
+ScreenGui.Parent = game.CoreGui
+
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Active = true
+MainFrame.Draggable = true
+UICorner.Parent = MainFrame
+
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)), 
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 0, 0)) 
+}
+UIGradient.Parent = MainFrame
+
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "FLY WASD"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+
+SpeedInput.Parent = MainFrame
+SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+SpeedInput.Size = UDim2.new(0.8, 0, 0, 30)
+SpeedInput.PlaceholderText = "Speed (WASD)..."
+SpeedInput.Text = ""
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+local InpCorner = Instance.new("UICorner")
+InpCorner.CornerRadius = UDim.new(0, 5)
+InpCorner.Parent = SpeedInput
+
+ToggleBtn.Parent = MainFrame
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0, 35)
+ToggleBtn.Text = "OFF"
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.Parent = ToggleBtn
+
+-- Core Fly Functions
+local function stopFly()
+    if bv then bv:Destroy() bv = nil end
+    if bg then bg:Destroy() bg = nil end
+    if Plr.Character and Plr.Character:FindFirstChild("Humanoid") then
+        Plr.Character.Humanoid.PlatformStand = false
+    end
+end
+
+local function startFly()
+    stopFly()
+    local root = Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    bv = Instance.new("BodyVelocity", root)
+    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bv.Velocity = Vector3.new(0, 0, 0)
+
+    bg = Instance.new("BodyGyro", root)
+    bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bg.CFrame = root.CFrame
+    
+    Plr.Character.Humanoid.PlatformStand = true
+end
+
+-- Logic Input
+SpeedInput.FocusLost:Connect(function()
+    flySpeed = tonumber(SpeedInput.Text) or 50
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    flyEnabled = not flyEnabled
+    if flyEnabled then
+        ToggleBtn.Text = "ON"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        startFly()
+    else
+        ToggleBtn.Text = "OFF"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        stopFly()
+    end
+end)
+
+-- Main Loop (Sử dụng GetKeysPressed để cực nhạy)
+RunService.RenderStepped:Connect(function()
+    if flyEnabled and bv and bg and Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") then
+        local root = Plr.Character.HumanoidRootPart
+        local moveDir = Vector3.new(0, 0, 0)
+        
+        -- Cập nhật hướng xoay theo Camera
+        bg.CFrame = Cam.CFrame
+        
+        -- Kiểm tra phím WASD trực tiếp mỗi frame
+        if UIS:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + Cam.CFrame.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - Cam.CFrame.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - Cam.CFrame.RightVector end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + Cam.CFrame.RightVector end
+        
+        if moveDir.Magnitude > 0 then
+            bv.Velocity = moveDir.Unit * flySpeed
+        else
+            bv.Velocity = Vector3.new(0, 0, 0) -- Đứng im khi thả phím
+        end
+    end
+end)
+
+print("Meo2 Dev Fly WASD Loaded!")
