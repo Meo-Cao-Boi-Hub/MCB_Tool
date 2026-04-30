@@ -1,0 +1,39 @@
+--[[
+    INFINITE JUMP (TOGGLE MODE) - BY MEO2 DEV
+    No GUI - Notification Only
+]]
+
+local StarterGui = game:GetService("StarterGui")
+local UserInputService = game:GetService("UserInputService")
+
+-- Kiểm tra trạng thái hiện tại (Sử dụng biến toàn cục để lưu trạng thái giữa các lần chạy)
+if _G.InfiniteJumpEnabled == nil then
+    _G.InfiniteJumpEnabled = false
+end
+
+-- Đảo trạng thái
+_G.InfiniteJumpEnabled = not _G.InfiniteJumpEnabled
+
+-- Gửi thông báo (Notification)
+local statusText = _G.InfiniteJumpEnabled and "bật" or "tắt"
+StarterGui:SetCore("SendNotification", {
+    Title = "MCB TOOL",
+    Text = "nhảy liên tục: " .. statusText,
+    Duration = 3
+})
+
+-- Logic nhảy vô hạn (Chỉ khởi tạo kết nối 1 lần duy nhất)
+if not _G.JumpConnected then
+    _G.JumpConnected = true
+    UserInputService.JumpRequest:Connect(function()
+        if _G.InfiniteJumpEnabled then
+            local Character = game.Players.LocalPlayer.Character
+            if Character then
+                local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+                if Humanoid then
+                    Humanoid:ChangeState("Jumping")
+                end
+            end
+        end
+    end)
+end
