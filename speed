@@ -1,0 +1,120 @@
+--[[
+    SPEED HACK CUSTOM UI - BY MEO2 DEV
+    Features: Custom Speed Input, Toggle On/Off
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIGradient = Instance.new("UIGradient")
+local Title = Instance.new("TextLabel")
+local SpeedInput = Instance.new("TextBox")
+local ToggleBtn = Instance.new("TextButton")
+local StatusLab = Instance.new("TextLabel")
+
+-- Settings logic
+local speedEnabled = false
+local currentSpeed = 16
+
+-- Setup ScreenGui
+ScreenGui.Name = "Meo2Dev_SpeedHub"
+ScreenGui.Parent = game.CoreGui
+
+-- Khung chính (Main Frame)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)), -- Màu cam lửa
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 170, 0)) 
+}
+UIGradient.Parent = MainFrame
+
+-- Tiêu đề
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "SPEED CHANGER"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+
+-- Ô nhập tốc độ (Input Box)
+SpeedInput.Name = "SpeedInput"
+SpeedInput.Parent = MainFrame
+SpeedInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+SpeedInput.Position = UDim2.new(0.1, 0, 0.3, 0)
+SpeedInput.Size = UDim2.new(0.8, 0, 0, 30)
+SpeedInput.Font = Enum.Font.Gotham
+SpeedInput.PlaceholderText = "Nhập tốc độ..."
+SpeedInput.Text = ""
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedInput.TextSize = 14
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 6)
+InputCorner.Parent = SpeedInput
+
+-- Nút Bật/Tắt (Toggle Button)
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = MainFrame
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0, 35)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "OFF"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.TextSize = 14
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 6)
+BtnCorner.Parent = ToggleBtn
+
+-- Logic thực thi (Technical Loop)
+SpeedInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local num = tonumber(SpeedInput.Text)
+        if num then
+            currentSpeed = num
+            print("Set speed to: " .. currentSpeed)
+        else
+            SpeedInput.Text = ""
+        end
+    end
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    speedEnabled = not speedEnabled
+    if speedEnabled then
+        ToggleBtn.Text = "ON"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    else
+        ToggleBtn.Text = "OFF"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+        -- Reset speed when off
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = 16
+        end
+    end
+end)
+
+-- Vòng lặp duy trì tốc độ (Main Loop)
+game:GetService("RunService").RenderStepped:Connect(function()
+    if speedEnabled then
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = currentSpeed
+        end
+    end
+end)
+
+print("Meo2 Dev Speed Script Loaded!")
