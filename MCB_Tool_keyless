@@ -1,0 +1,189 @@
+-- MCB TOOL V0.1 (Horizontal Edition with Background)
+local Player = game.Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+local RunService = game:GetService("RunService")
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MCB_Tool_Final"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- Main Menu Frame (16:9 Aspect Ratio)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 600, 0, 337)
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -168)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+-- Background Image (Thêm ảnh nền ở đây)
+local BgImage = Instance.new("ImageLabel")
+BgImage.Name = "BackgroundImage"
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.Position = UDim2.new(0, 0, 0, 0)
+BgImage.Image = "rbxassetid://87021841218324"
+BgImage.ImageTransparency = 0.3 -- Chỉnh độ mờ ảnh nền (0 là rõ nhất)
+BgImage.ScaleType = Enum.ScaleType.Stretch
+BgImage.ZIndex = 0 -- Đảm bảo ảnh nằm dưới cùng
+BgImage.BackgroundTransparency = 1
+BgImage.Parent = MainFrame
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+UICorner:Clone().Parent = BgImage -- Bo góc luôn cả ảnh nền
+
+-- Viền cầu vồng
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 3
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Parent = MainFrame
+
+RunService.RenderStepped:Connect(function()
+    local hue = tick() % 5 / 5
+    UIStroke.Color = Color3.fromHSV(hue, 1, 1)
+end)
+
+-- Header
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 70)
+Header.BackgroundTransparency = 1
+Header.ZIndex = 2
+Header.Parent = MainFrame
+
+local AvatarImg = Instance.new("ImageLabel")
+AvatarImg.Size = UDim2.new(0, 45, 0, 45)
+AvatarImg.Position = UDim2.new(0, 15, 0.5, -22)
+AvatarImg.Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150"
+AvatarImg.BackgroundTransparency = 1
+AvatarImg.ZIndex = 3
+AvatarImg.Parent = Header
+
+local AvatarCorner = Instance.new("UICorner")
+AvatarCorner.CornerRadius = UDim.new(1, 0)
+AvatarCorner.Parent = AvatarImg
+
+local Title = Instance.new("TextLabel")
+Title.Text = "MCB TOOL V0.1"
+Title.Size = UDim2.new(0, 200, 0, 25)
+Title.Position = UDim2.new(0, 70, 0, 15)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextSize = 20
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.BackgroundTransparency = 1
+Title.ZIndex = 3
+Title.Parent = Header
+
+local Username = Instance.new("TextLabel")
+Username.Text = Player.DisplayName or Player.Name
+Username.Size = UDim2.new(0, 200, 0, 20)
+Username.Position = UDim2.new(0, 70, 0, 38)
+Username.TextColor3 = Color3.fromRGB(220, 220, 220)
+Username.TextSize = 13
+Username.Font = Enum.Font.Gotham
+Username.TextXAlignment = Enum.TextXAlignment.Left
+Username.BackgroundTransparency = 1
+Username.ZIndex = 3
+Username.Parent = Header
+
+-- Nút đóng (X)
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 35, 0, 30)
+CloseBtn.Position = UDim2.new(1, -45, 0, 15)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.ZIndex = 3
+CloseBtn.Parent = Header
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+-- Logo vuông khi đóng
+local FloatingLogo = Instance.new("ImageButton")
+FloatingLogo.Size = UDim2.new(0, 55, 0, 55)
+FloatingLogo.Position = UDim2.new(0.05, 0, 0.4, 0)
+FloatingLogo.Image = "rbxassetid://140634741245149"
+FloatingLogo.Visible = false
+FloatingLogo.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+FloatingLogo.Active = true
+FloatingLogo.Draggable = true
+FloatingLogo.Parent = ScreenGui
+
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(0, 8)
+LogoCorner.Parent = FloatingLogo
+
+-- Layout nút bấm
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1, -20, 1, -85)
+Scroll.Position = UDim2.new(0, 10, 0, 75)
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollBarThickness = 2
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 400)
+Scroll.ZIndex = 2
+Scroll.Parent = MainFrame
+
+local UIGrid = Instance.new("UIGridLayout")
+UIGrid.CellSize = UDim2.new(0, 275, 0, 35)
+UIGrid.CellPadding = UDim2.new(0, 10, 0, 10)
+UIGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIGrid.Parent = Scroll
+
+local function CreateButton(name, url)
+    local btn = Instance.new("TextButton")
+    btn.Text = name
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.BackgroundTransparency = 0.2 -- Cho nút hơi trong suốt để thấy nền
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.ZIndex = 3
+    btn.Parent = Scroll
+    
+    local bCorner = Instance.new("UICorner")
+    bCorner.CornerRadius = UDim.new(0, 5)
+    bCorner.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        local rawUrl = url:gsub("github.com", "raw.githubusercontent.com"):gsub("/blob/", "/")
+        loadstring(game:HttpGet(rawUrl))()
+    end)
+end
+
+local Scripts = {
+    {"Tốc độ", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/speed"},
+    {"Nhảy cao", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/jump_power"},
+    {"Nhảy vô hạn", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/jump_infinite"},
+    {"Bay", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/fly"},
+    {"Đi trên không", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/walk_on_air"},
+    {"Camera không giới hạn", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/Increase_Camera_Range"},
+    {"Xuyên tường", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/noclip"},
+    {"Click Tele", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/click_tele"},
+    {"Xóa sương mù", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/remove_fog"},
+    {"Disco Tacos", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/disco_tacos"},
+    {"Nhìn trong bóng tối", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/night_vision"},
+    {"Tua ngược", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/re_time"},
+    {"X-ray", "https://github.com/Meo-Cao-Boi-Hub/MCB_Tool/blob/main/x-ray"}
+}
+
+for _, data in pairs(Scripts) do
+    CreateButton(data[1], data[2])
+end
+
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    FloatingLogo.Visible = true
+end)
+
+FloatingLogo.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    FloatingLogo.Visible = false
+end)
